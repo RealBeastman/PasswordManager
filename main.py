@@ -41,8 +41,22 @@ def setup_password():
         save_hash(password)
         print("Master password saved.")
 
+def setup_database():
+    from app.utils.db import Base, engine
+    from app.models.password_entry import PasswordEntry
+    Base.metadata.create_all(engine)
+    print("Database setup complete.")
+
 
 if __name__ == "__main__":
     if not os.path.exists("app/data/hash.key"):
         setup_password()
+    else:
+        print("Master password already set.")
+
+    if not os.path.exists("app/data/passwords.db"):
+        setup_database()
+    else:
+        print("Database already exists.")
+
     main()

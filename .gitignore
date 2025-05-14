@@ -178,3 +178,4 @@ cython_debug/
 *.db
 *.key
 *.token
+app/assets/
