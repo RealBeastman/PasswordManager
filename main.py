@@ -7,25 +7,42 @@ from app.views.main_window import MainWindow
 def main():
     app = QApplication(sys.argv)
 
-    # Prompt for master password
-    password, ok = QInputDialog.getText(None, "Unlock Vault", "Enter Master Password:", QLineEdit.Password)
+    password, ok = QInputDialog.getText(None, "Unlock Vault", "Master Password:", QLineEdit.Password)
     if not ok or not password:
         sys.exit()
 
     try:
-        # Check if db exists
-        if not os.path.exists("app/data/passwords.db"):
-            from app.utils.db import Base, engine
-            Base.metadata.create_all(engine)
         fernet = unlock_app(password)
     except Exception:
-        QMessageBox.critical(None, "Error", "Invalid master password.")
+        QMessageBox.critical(None, "Access Denied", "Invalid password.")
         sys.exit()
 
-    # Load main window with fernet
     window = MainWindow(fernet)
     window.show()
     sys.exit(app.exec())
 
+def setup_password():
+    from app.utils.password_hashing import save_hash
+    import os
+
+    def create_salt():
+        if not os.path.exists("app/data/salt.bin"):
+            with open("app/data/salt.bin", "wb") as f:
+                f.write(os.urandom(16))
+
+    create_salt()
+
+    password = input("Enter a new master password: ")
+    confirm = input("Confirm the master password: ")
+
+    if password != confirm:
+        print("Passwords do not match.")
+    else:
+        save_hash(password)
+        print("Master password saved.")
+
+
 if __name__ == "__main__":
+    if not os.path.exists("app/data/hash.key"):
+        setup_password()
     main()
