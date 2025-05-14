@@ -1,16 +1,26 @@
 import sys
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QInputDialog, QLineEdit, QMessageBox
+from app.utils.auth import unlock_app
 from app.views.main_window import MainWindow
 
 def main():
     app = QApplication(sys.argv)
-    with open("app/styles/dark_theme.qss", "r") as f:
-        app.setStyleSheet(f.read())
-    window = MainWindow()
-    window.show()
 
-    exit_code = app.exec()
-    sys.exit(exit_code)
+    # Prompt for master password
+    password, ok = QInputDialog.getText(None, "Unlock Vault", "Enter Master Password:", QLineEdit.Password)
+    if not ok or not password:
+        sys.exit()
+
+    try:
+        fernet = unlock_app(password)
+    except Exception:
+        QMessageBox.critical(None, "Error", "Invalid master password.")
+        sys.exit()
+
+    # Load main window with fernet
+    window = MainWindow(fernet)
+    window.show()
+    sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()

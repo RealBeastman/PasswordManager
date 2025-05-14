@@ -8,7 +8,7 @@ from PySide6.QtCore import Qt
 
 
 class NewPasswordDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, fernet, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Add New Password")
         self.setMinimumWidth(400)
