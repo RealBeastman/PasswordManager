@@ -1,12 +1,13 @@
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-    QPushButton, QFrame
+    QPushButton, QFrame, QCheckBox
 )
 from PySide6.QtCore import Qt
 from app.utils.db import SessionLocal
 from app.utils.encryption import encrypt
 from app.models.password_entry import PasswordEntry
 from app.utils.site_icon import get_favicon_local_path
+from app.utils.encryption import decrypt
 
 
 class NewPasswordDialog(QDialog):
@@ -58,6 +59,11 @@ class NewPasswordDialog(QDialog):
         password_row.addWidget(self.generate_button)
         layout.addLayout(password_row)
 
+        self.show_password_checkbox = QCheckBox("Show Password")
+        self.show_password_checkbox.toggled.connect(self.toggle_password_visibility)
+        self.show_password_checkbox.setChecked(False)
+        layout.addWidget(self.show_password_checkbox)
+
         # Save
         self.submit_button = QPushButton("Save Password")
         self.submit_button.clicked.connect(self.save_password)
@@ -67,10 +73,15 @@ class NewPasswordDialog(QDialog):
 
         # Pre-fill fields if editing
         if existing_entry:
-            self.name_input.setText(existing_entry.name)
-            self.url_input.setText(existing_entry.url or "")
-            self.username_input.setText(existing_entry.username or "")
-            self.password_input.setText("••••••••")  # Mask for security
+            try:
+                decrypted_password = decrypt(existing_entry.password, self.fernet)
+                self.name_input.setText(existing_entry.name)
+                self.url_input.setText(existing_entry.url or "")
+                self.username_input.setText(existing_entry.username or "")
+                self.password_input.setText(decrypted_password)
+            except Exception as e:
+                print(f"Error decrypting password: {e}")
+                self.password_input.setText("••••••••")
 
     def save_password(self):
         name = self.name_input.text().strip()
@@ -120,3 +131,8 @@ class NewPasswordDialog(QDialog):
 
         print("✅ Password saved successfully.")
         self.accept()
+
+    def toggle_password_visibility(self, checked):
+        self.password_input.setEchoMode(
+            QLineEdit.Normal if checked else QLineEdit.Password
+        )
