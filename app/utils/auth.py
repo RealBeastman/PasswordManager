@@ -1,7 +1,8 @@
-from app.utils.encryption import derive_key_from_password, load_salt
 from cryptography.fernet import Fernet
+from app.utils.password_hashing import verify_password
+from app.utils.encryption import get_fernet
 
 def unlock_app(master_password: str) -> Fernet:
-    salt = load_salt()
-    key = derive_key_from_password(master_password, salt)
-    return Fernet(key)
+    if not verify_password(master_password):
+        raise ValueError("Invalid master password.")
+    return get_fernet(master_password)

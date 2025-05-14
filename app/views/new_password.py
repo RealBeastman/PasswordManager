@@ -6,14 +6,15 @@ from PySide6.QtCore import Qt
 from app.utils.db import SessionLocal
 from app.utils.encryption import encrypt
 from app.models.password_entry import PasswordEntry
-from app.utils.site_icon import get_favicon_url
+from app.utils.site_icon import get_favicon_local_path
 
 
 class NewPasswordDialog(QDialog):
-    def __init__(self, fernet, parent=None):
+    def __init__(self, fernet, parent=None, existing_entry: PasswordEntry = None):
         super().__init__(parent)
-        self.setWindowTitle("Add New Password")
+        self.setWindowTitle("Edit Password" if existing_entry else "Add New Password")
         self.fernet = fernet
+        self.existing_entry = existing_entry
         self.setMinimumWidth(400)
 
         layout = QVBoxLayout(self)
@@ -21,7 +22,7 @@ class NewPasswordDialog(QDialog):
         layout.setContentsMargins(10, 10, 10, 10)
 
         # Title
-        title = QLabel("Add New Password")
+        title = QLabel("Edit Password" if existing_entry else "Add New Password")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
 
@@ -64,32 +65,58 @@ class NewPasswordDialog(QDialog):
 
         self.setLayout(layout)
 
+        # Pre-fill fields if editing
+        if existing_entry:
+            self.name_input.setText(existing_entry.name)
+            self.url_input.setText(existing_entry.url or "")
+            self.username_input.setText(existing_entry.username or "")
+            self.password_input.setText("••••••••")  # Mask for security
+
     def save_password(self):
-        # Obtain the data from the input fields
-        name = self.name_input.text()
-        url = self.url_input.text()
-        username = self.username_input.text()
-        password = self.password_input.text()
+        name = self.name_input.text().strip()
+        url = self.url_input.text().strip()
+        username = self.username_input.text().strip()
+        password = self.password_input.text().strip()
 
-        if not name or not password:
-            print("Name and password are required.")
+        if not name:
+            print("Name is required.")
             return
-        
-        # Encrypt the password
-        encrypted_password = encrypt(password, self.fernet)
 
-        # Create a new PasswordEntry object and save to db
+        # Only re-encrypt if the user typed a new password
+        if self.existing_entry and password == "••••••••":
+            encrypted_password = self.existing_entry.password
+        else:
+            if not password:
+                print("Password is required.")
+                return
+            encrypted_password = encrypt(password, self.fernet)
+
+
+        encrypted_password = encrypt(password, self.fernet)
+        favicon_path = get_favicon_local_path(url) if url else None
+
         db = SessionLocal()
-        entry = PasswordEntry(
-            name=name,
-            url=url,
-            username=username,
-            password=encrypted_password,
-            favicon_url=get_favicon_url(url) if url else None
-        )
-        db.add(entry)
+        if self.existing_entry:
+            # Update existing entry
+            self.existing_entry.name = name
+            self.existing_entry.url = url
+            self.existing_entry.username = username
+            self.existing_entry.password = encrypted_password
+            self.existing_entry.favicon_url = favicon_path
+            db.add(self.existing_entry)
+        else:
+            # New entry
+            entry = PasswordEntry(
+                name=name,
+                url=url,
+                username=username,
+                password=encrypted_password,
+                favicon_url=favicon_path
+            )
+            db.add(entry)
+
         db.commit()
         db.close()
 
-        print("Password saved successfully.")
-        self.accept() # Close the dialog
+        print("✅ Password saved successfully.")
+        self.accept()
