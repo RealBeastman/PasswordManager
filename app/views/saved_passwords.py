@@ -8,8 +8,9 @@ from app.views.new_password import NewPasswordDialog
 
 
 class SavedPasswordsWidget(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, fernet, parent=None):
         super().__init__(parent)
+        self.fernet = fernet
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
@@ -35,5 +36,5 @@ class SavedPasswordsWidget(QWidget):
         layout.addWidget(placeholder)
 
     def open_add_dialog(self):
-        dialog = NewPasswordDialog(self)
+        dialog = NewPasswordDialog(self.fernet, self)
         dialog.exec()

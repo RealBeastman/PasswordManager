@@ -17,7 +17,7 @@ def framed_widget(widget, name: str) -> QFrame:
     return frame
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, fernet):
         super().__init__()
         self.setWindowTitle("Password Manager")
         self.resize(QSize(1280, 720))
@@ -27,5 +27,5 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
         # Only show SavedPasswordsWidget now
-        right_panel = framed_widget(SavedPasswordsWidget(), "SavedPasswordsPanel")
+        right_panel = framed_widget(SavedPasswordsWidget(fernet), "SavedPasswordsPanel")
         layout.addWidget(right_panel)
