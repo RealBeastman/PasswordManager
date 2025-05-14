@@ -22,11 +22,6 @@ class NewPasswordDialog(QDialog):
         layout.setSpacing(10)
         layout.setContentsMargins(10, 10, 10, 10)
 
-        # Title
-        title = QLabel("Edit Password" if existing_entry else "Add New Password")
-        title.setAlignment(Qt.AlignCenter)
-        layout.addWidget(title)
-
         # Divider
         divider = QFrame()
         divider.setFrameShape(QFrame.HLine)
