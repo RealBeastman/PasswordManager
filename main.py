@@ -1,3 +1,4 @@
+import os
 import sys
 from PySide6.QtWidgets import QApplication, QInputDialog, QLineEdit, QMessageBox
 from app.utils.auth import unlock_app
@@ -12,6 +13,10 @@ def main():
         sys.exit()
 
     try:
+        # Check if db exists
+        if not os.path.exists("app/data/passwords.db"):
+            from app.utils.db import Base, engine
+            Base.metadata.create_all(engine)
         fernet = unlock_app(password)
     except Exception:
         QMessageBox.critical(None, "Error", "Invalid master password.")

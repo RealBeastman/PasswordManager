@@ -9,3 +9,4 @@ class PasswordEntry(Base):
     url = Column(String)
     username = Column(String)
     password = Column(String, nullable=False) # will be encrypted
+    favicon_url = Column(String)
