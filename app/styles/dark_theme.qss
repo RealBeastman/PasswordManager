@@ -1,0 +1,90 @@
+/* ========== Global Styling ========== */
+QMainWindow, QDialog {
+    background-color: #21222C;
+    color: #EAEAEA;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 14px;
+}
+
+/* ========== Labels ========== */
+QLabel {
+    color: #D3D3D3;
+}
+
+QLabel#sectionTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: #FAFAFA;
+    padding: 4px 0;
+}
+
+/* ========== Text Inputs ========== */
+QLineEdit {
+    background-color: #2C2F3A;
+    border: 1px solid #3F4451;
+    border-radius: 6px;
+    padding: 6px;
+    color: #F5F5F5;
+}
+
+QLineEdit:focus {
+    border: 1px solid #6C7A89;
+}
+
+/* ========== Buttons ========== */
+QPushButton {
+    background-color: #3B4B5A;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+}
+
+QPushButton:hover {
+    background-color: #4B5E70;
+}
+
+QPushButton:pressed {
+    background-color: #2F3E4F;
+}
+
+/* ========== Checkboxes ========== */
+QCheckBox {
+    color: #C2C2C2;
+    spacing: 8px;
+}
+
+/* ========== Framed Panels ========== */
+QFrame#panelFrame {
+    background-color: #2A2D3A;
+    border: 1px solid #3B3F4C;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+/* ========== List View Container ========== */
+QListWidget {
+    background-color: #20222C;
+    border: none;
+    padding: 6px;
+}
+
+/* ========== Custom List Items ========== */
+QFrame#listItemFrame {
+    background-color: #292B36;
+    border: 1px solid #3C3F4D;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 8px 4px;
+}
+
+QFrame#listItemFrame:hover {
+    background-color: #333645;
+    border: 1px solid #5A5E72;
+}
+
+/* Optional: if still using native list items */
+QListWidget::item:selected {
+    background-color: #445566;
+    color: #ffffff;
+}

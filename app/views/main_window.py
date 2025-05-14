@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
     def __init__(self, fernet):
         super().__init__()
         self.setWindowTitle("Password Manager")
-        self.resize(QSize(1280, 720))
+        self.resize(QSize(750, 900))
 
         container = QWidget()
         layout = QVBoxLayout(container)

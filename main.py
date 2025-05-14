@@ -6,6 +6,8 @@ from app.views.main_window import MainWindow
 
 def main():
     app = QApplication(sys.argv)
+    with open("app/styles/dark_theme.qss", "r") as f:
+        app.setStyleSheet(f.read())
 
     password, ok = QInputDialog.getText(None, "Unlock Vault", "Master Password:", QLineEdit.Password)
     if not ok or not password:

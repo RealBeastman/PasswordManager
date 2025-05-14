@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
      QWidget, QHBoxLayout, QLabel, QPushButton, QMessageBox, 
-     QApplication
+     QApplication, QVBoxLayout
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
@@ -15,13 +15,15 @@ class PasswordListItem(QWidget):
         self.entry = entry
         self.fernet = fernet
         self.refresh_callback = refresh_callback
+        self.setObjectName("listItemFrame")
 
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(10, 5, 10, 5)
+        layout.setContentsMargins(12, 10, 12, 10)  # More breathing room
+        layout.setSpacing(20)  # Padding between elements
 
-        # Password Entry Favicon
+        # Favicon
         self.favicon_label = QLabel()
-        self.favicon_label.setFixedSize(24, 24)
+        self.favicon_label.setFixedSize(32, 32)
         if self.entry.favicon_url:
             pixmap = QPixmap(self.entry.favicon_url)
         else:
@@ -29,33 +31,36 @@ class PasswordListItem(QWidget):
         self.favicon_label.setPixmap(pixmap.scaled(24, 24, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         layout.addWidget(self.favicon_label)
 
-        # Password Entry Name
-        self.name_label = QLabel(entry.name)
-        layout.addWidget(self.name_label)
+        # Label group layout (stacked left section)
+        label_layout = QVBoxLayout()
+        label_layout.setSpacing(2)
 
-        # Password Entry Username
-        self.username_label = QLabel(entry.username)
-        layout.addWidget(self.username_label)
+        self.name_label = QLabel()
+        self.name_label.setTextFormat(Qt.RichText)
+        self.name_label.setText(f"🔒 <b>{entry.name}</b>")
+        self.username_label = QLabel(f"👤 {entry.username}")
+        self.url_label = QLabel(f"🌐 {entry.url}")
 
-        # Password Entry URL
-        self.url_label = QLabel(entry.url)
-        layout.addWidget(self.url_label)
+        for lbl in [self.name_label, self.username_label, self.url_label]:
+            lbl.setStyleSheet("color: #ccc; font-size: 13px;")
+            label_layout.addWidget(lbl)
+
+        layout.addLayout(label_layout)
         layout.addStretch()
 
-        # Copy Button
+        # Action buttons
         self.copy_button = QPushButton("🔑 Copy")
         self.copy_button.clicked.connect(self.copy_password)
-        layout.addWidget(self.copy_button)
 
-        # Edit Button
         self.edit_button = QPushButton("✏️ Edit")
         self.edit_button.clicked.connect(self.edit_password)
-        layout.addWidget(self.edit_button)
 
-        # Delete Button
         self.delete_button = QPushButton("🗑️ Delete")
         self.delete_button.clicked.connect(self.delete_password)
-        layout.addWidget(self.delete_button)
+
+        for btn in [self.copy_button, self.edit_button, self.delete_button]:
+            layout.addWidget(btn)
+
 
     def copy_password(self):
         try:
